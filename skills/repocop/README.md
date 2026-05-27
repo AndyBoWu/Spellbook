@@ -1,4 +1,4 @@
-# repo-audit
+# repocop
 
 Scan a repo for secrets, quality issues, missing docs, and compliance problems before going public.
 
@@ -6,7 +6,7 @@ Scan a repo for secrets, quality issues, missing docs, and compliance problems b
 
 ```bash
 # Install the plugin
-/plugin install repo-audit@spellbook
+/plugin install repocop@spellbook
 
 # Ask the agent to scan
 Scan this repository for public readiness issues
@@ -16,16 +16,16 @@ Scan this repository for public readiness issues
 
 ```bash
 # Scan a repository
-./skills/repo-audit/scripts/run_scan.sh /path/to/repo
+./skills/repocop/scripts/run_scan.sh /path/to/repo
 
 # Save report to file
-./skills/repo-audit/scripts/run_scan.sh /path/to/repo > report.md
+./skills/repocop/scripts/run_scan.sh /path/to/repo > report.md
 ```
 
 ## GitHub Actions
 
 ```yaml
-- uses: AndyBoWu/Spellbook/skills/repo-audit@main
+- uses: AndyBoWu/Spellbook/skills/repocop@main
   id: scan
   with:
     repo_path: "."

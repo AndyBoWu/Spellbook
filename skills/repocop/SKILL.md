@@ -1,5 +1,5 @@
 ---
-name: repo-audit
+name: repocop
 description: "Scans repositories for hardcoded secrets, API keys, credentials, PII, Web3 private keys, code quality issues, missing documentation, and compliance problems before making them public. Use when preparing to open-source a private repo, auditing a codebase for accidentally committed secrets, or running a pre-release security and compliance checklist."
 license: MIT
 compatibility: "Requires bash 4.0+, grep, find, file, wc, du, stat. Optional: gitleaks, shellcheck, trivy, jq for enhanced checks."
@@ -32,7 +32,7 @@ This Skill supports three consumption models:
 | Model | How it works | When to use |
 |-------|-------------|-------------|
 | **A — Script Execution** | Run `run_scan.sh` and read the Markdown report | You have bash and want automated, deterministic results |
-| **B — Knowledge-Driven** | An LLM reads the [Scan Specification](https://github.com/AndyBoWu/Spellbook/blob/main/skills/repo-audit/references/SCAN_SPEC.md) and performs the checks using its own tools | No bash available, or the LLM is operating in a sandboxed environment |
+| **B — Knowledge-Driven** | An LLM reads the [Scan Specification](https://github.com/AndyBoWu/Spellbook/blob/main/skills/repocop/references/SCAN_SPEC.md) and performs the checks using its own tools | No bash available, or the LLM is operating in a sandboxed environment |
 | **C — Hybrid** | An LLM runs the scripts AND uses the spec to interpret, triage, or extend findings | Best coverage — combines automation with LLM judgment |
 
 ## Prerequisites
@@ -54,17 +54,17 @@ If an optional tool is not installed, the scanner reports the check as **SKIPPED
 
 ```bash
 # Basic usage — report to stdout
-./skills/repo-audit/scripts/run_scan.sh /path/to/target/repo
+./skills/repocop/scripts/run_scan.sh /path/to/target/repo
 
 # Save report to file
-./skills/repo-audit/scripts/run_scan.sh /path/to/repo > report.md
+./skills/repocop/scripts/run_scan.sh /path/to/repo > report.md
 ```
 
 The scanner executes five check modules in sequence, then generates a Markdown report with an overall verdict.
 
 ## Scan Dimensions
 
-The scanner checks five dimensions. For the complete check-by-check specification, see [SCAN_SPEC.md](https://github.com/AndyBoWu/Spellbook/blob/main/skills/repo-audit/references/SCAN_SPEC.md).
+The scanner checks five dimensions. For the complete check-by-check specification, see [SCAN_SPEC.md](https://github.com/AndyBoWu/Spellbook/blob/main/skills/repocop/references/SCAN_SPEC.md).
 
 | Dimension | What it covers | Severities |
 |-----------|---------------|------------|
@@ -90,7 +90,7 @@ Every finding includes: severity, file path, line number (where applicable), des
 
 ## Report Format
 
-See [REPORT_FORMAT.md](https://github.com/AndyBoWu/Spellbook/blob/main/skills/repo-audit/references/REPORT_FORMAT.md) for the full report template and severity icons.
+See [REPORT_FORMAT.md](https://github.com/AndyBoWu/Spellbook/blob/main/skills/repocop/references/REPORT_FORMAT.md) for the full report template and severity icons.
 
 ## Validation
 
@@ -98,7 +98,7 @@ See [REPORT_FORMAT.md](https://github.com/AndyBoWu/Spellbook/blob/main/skills/re
 - Each finding includes file path, line number (where applicable), description, and remediation.
 - The overall verdict matches the scoring logic (CRITICAL → NOT READY, HIGH → NEEDS WORK).
 - Running the scanner twice on the same repo produces the same results (deterministic).
-- For Model B: the LLM should aim to cover all checks listed in the [Scan Specification](https://github.com/AndyBoWu/Spellbook/blob/main/skills/repo-audit/references/SCAN_SPEC.md). Checks that cannot be performed (e.g., no access to git history) should be reported as SKIPPED with a reason.
+- For Model B: the LLM should aim to cover all checks listed in the [Scan Specification](https://github.com/AndyBoWu/Spellbook/blob/main/skills/repocop/references/SCAN_SPEC.md). Checks that cannot be performed (e.g., no access to git history) should be reported as SKIPPED with a reason.
 
 ## Common Pitfalls
 

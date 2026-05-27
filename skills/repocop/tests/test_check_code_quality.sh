@@ -44,9 +44,9 @@ package main"
 
 test_scanner_dir_excluded() {
   setup_fixture_dir
-  # check_code_quality.sh excludes paths matching /repo-audit/scripts/
-  mkdir -p "$FIXTURE_REPO/repo-audit/scripts"
-  create_file_ln "repo-audit/scripts/check.sh" "# TODO: this should be excluded"
+  # check_code_quality.sh excludes paths matching /repocop/scripts/
+  mkdir -p "$FIXTURE_REPO/repocop/scripts"
+  create_file_ln "repocop/scripts/check.sh" "# TODO: this should be excluded"
   run_check "$CHECK"
   assert_not_contains "$OUTPUT" "todo_comment" "scanner dir excluded from TODO scan"
   teardown_fixture_dir

@@ -1,5 +1,5 @@
 {
-  "name": "repo-audit",
+  "name": "repocop",
   "description": "Scans repositories for secrets, code quality issues, missing documentation, and compliance problems before making them public",
   "version": "0.1.0",
   "author": {

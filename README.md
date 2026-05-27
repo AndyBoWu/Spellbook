@@ -10,7 +10,7 @@ Each folder under `skills/` is one **spell** — a self-contained reference Clau
 |---|---|---|
 | [`init2`](skills/init2/) | Generates **both** `CLAUDE.md` and `AGENTS.md` from one codebase scan — for repos used with Claude Code *and* OpenAI Codex | Shipped |
 | [`ghactor`](skills/ghactor/) | Generates GitHub Actions workflows with security and efficiency best practices baked in | Shipped |
-| [`repo-audit`](skills/repo-audit/) | Scans a repo for secrets, code quality, missing docs, and compliance issues before going public | Shipped |
+| [`repocop`](skills/repocop/) | Scans a repo for secrets, code quality, missing docs, and compliance issues before going public | Shipped |
 | `playbook` | Authors playbooks for AI agents — operational procedures with triggers, diagnostic steps, recovery, rollback | TO-DO |
 | `repome` | Opinionated README author — minimalist layout, real badges only, no vanity metrics | TO-DO |
 

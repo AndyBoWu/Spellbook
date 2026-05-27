@@ -25,7 +25,7 @@ done < <(grep -rnEi '\b(TODO|FIXME|HACK|XXX)\b' "$REPO_PATH" \
   --include='*.h' --include='*.hpp' --include='*.css' --include='*.scss' \
   --include='*.vue' --include='*.svelte' \
   --exclude-dir='.git' --exclude-dir='node_modules' \
-  2>/dev/null | grep -v '/repo-audit/scripts/' || true)
+  2>/dev/null | grep -v '/repocop/scripts/' || true)
 
 # --- shellcheck (if available) ---
 if command -v shellcheck &>/dev/null; then
