@@ -13,7 +13,7 @@ Upcoming spells, in rough priority order. Each entry is a sketch, not a spec —
 
 ## Planned spells
 
-### `readme-design` — opinionated README author
+### `repome` — opinionated README author
 
 Most repo READMEs are ugly. This spell treats a README like a small personal website for the repo.
 

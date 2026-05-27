@@ -10,6 +10,7 @@ Each folder under `skills/` is one **spell** — a self-contained reference Clau
 |---|---|---|
 | [`init2`](skills/init2/) | Generates **both** `CLAUDE.md` and `AGENTS.md` from one codebase scan — for repos used with Claude Code *and* OpenAI Codex | Shipped |
 | `playbook` | Authors playbooks for AI agents — operational procedures with triggers, diagnostic steps, recovery, rollback | TO-DO |
+| `repome` | Opinionated README author — minimalist layout, real badges only, no vanity metrics | TO-DO |
 
 ## Install
 
