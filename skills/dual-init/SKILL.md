@@ -65,6 +65,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Then the content sections, sized to the project. **Do not** include generic dev advice ("write tests", "don't commit secrets"). **Do** include the load-bearing facts from step 2.
 
+**Structural rule:** the section headings you pick here must be reused verbatim in AGENTS.md (step 4). Only the final tool-specific notes section differs. Drift between the two files almost always starts with someone reorganizing one of them — lock the skeleton at this step.
+
+**For docs-only / pre-implementation repos** (no source code yet): list planned build/lint/test commands with an explicit "these do not exist yet — do not run them" warning. Source them from `docs/PLAN.md` or equivalent. Never invent commands, but also don't omit them — future agents need to know what's coming.
+
 ### 4. Write `AGENTS.md`
 
 Same content, but reframed for Codex conventions:
@@ -82,21 +86,25 @@ This file provides guidance to OpenAI Codex (and other agents reading the agents
 - AGENTS.md may include a brief "Codex notes" section if Codex has known quirks in this repo (e.g., a particular sandbox policy, a non-default working directory expectation)
 
 **What stays identical:**
+- Section headings (every section except the final `<Agent> notes` block)
 - Project purpose
 - Build/lint/test commands
 - Architecture summary
 - Load-bearing constraints
 - Source-of-truth pointers
 
-If you find yourself rewriting more than ~20% of the content between the two files, you're probably over-customizing. The whole point is they describe the same project.
+If you find yourself rewriting more than ~20% of the content — or reorganizing the section structure between the two files — you're over-customizing. The whole point is they describe the same project. A clean `diff CLAUDE.md AGENTS.md` should show: the header, the final notes section, and at most a few tonal swaps ("Defer to" vs. "Read"). Nothing more.
 
 ### 5. Verify
 
 - Both files exist at the repo root
 - Both start with their correct header
+- **`diff CLAUDE.md AGENTS.md` is short.** Acceptable differences: headers (lines 1–3), the final tool-specific notes section, a handful of single-word tonal swaps. Anything more means you reorganized — go back and align.
+- Section headings match across the two files (except the final `<Agent> notes` block)
 - Build/lint/test commands match byte-for-byte across the two
 - No facts contradict each other
 - Neither file invents commands or files that don't exist (verify with `ls` / quick `grep` before claiming a script is present)
+- For docs-only repos: planned commands are clearly marked as not-yet-runnable
 
 ### 6. Report
 
@@ -123,9 +131,16 @@ One short summary: what you wrote, where the facts came from, what you chose to 
 | Pasting full file contents in the summary | Wastes user's context, they can `cat` the file | One-paragraph summary only |
 | Inventing build commands not in the repo | Future agents will run them and fail | Verify every command against actual scripts/Makefile/package.json before writing it |
 | Diverging architecture summaries between the two files | Defeats the whole point of dual-init | Write architecture once, paste into both |
+| Diverging section structure (different headings, different ordering) | Most common drift vector — observed in v0.1 baseline testing | Lock the heading skeleton when writing CLAUDE.md, reuse verbatim for AGENTS.md |
+| Omitting build/lint/test entirely because the repo has no code yet | Future agents won't know what commands are coming | List planned commands from PLAN.md, mark them clearly as not-yet-runnable |
 | Overwriting an existing CLAUDE.md or AGENTS.md without asking | Destroys curated content | If a file exists, propose a diff and confirm before overwriting |
 | Including generic dev advice ("write tests", "use semantic commits") | Bloat that's not project-specific | Cut it. CLAUDE.md/AGENTS.md is for *this* repo, not for general best practices |
 
 ## Status
 
-**v0.1** — generates both files from a single scan, with the tonal split above. Formal TDD-style verification (baseline subagent run → skill → re-run) pending before declaring v1.0.
+**v0.2** — generates both files from a single scan, with the tonal split above. Verified against a docs-only Swift repo (Burnbar) with paired subagent runs (baseline vs. with-skill):
+
+- Baseline output: two 108-line files with **0/9 matching section headings** — heavy structural drift.
+- With-skill output: two ~78-line files with **7/8 matching section headings** — only the final tool-specific notes section differs.
+
+Both runs handled "commands don't exist yet" correctly; the structural-alignment win is what the skill adds.
