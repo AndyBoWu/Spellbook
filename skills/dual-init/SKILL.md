@@ -144,3 +144,5 @@ One short summary: what you wrote, where the facts came from, what you chose to 
 - With-skill output: two ~78-line files with **7/8 matching section headings** — only the final tool-specific notes section differs.
 
 Both runs handled "commands don't exist yet" correctly; the structural-alignment win is what the skill adds.
+
+Full methodology, prompts, and reproducibility instructions in [`TESTING.md`](TESTING.md).

@@ -50,10 +50,13 @@ Once installed:
 ```
 skills/<spell-name>/
   SKILL.md       # required — YAML frontmatter + instructions
+  TESTING.md     # recommended — TDD methodology, metrics, reproducible prompts
   ...            # supporting files only if needed
 ```
 
 See [agentskills.io/specification](https://agentskills.io/specification) for the SKILL.md frontmatter spec.
+
+Skills here are gated on **paired subagent runs** (baseline without the skill, then with). See [`skills/dual-init/TESTING.md`](skills/dual-init/TESTING.md) for the template. No skill edit lands without a failing test first.
 
 ## License
 
