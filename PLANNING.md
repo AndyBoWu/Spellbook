@@ -49,4 +49,4 @@ Ankane's gem READMEs (terse, imperative). `bat`, `ripgrep`, `zellij` (badge layo
 
 One-liners only. Promote to a full section when ready to design.
 
-- _(none yet)_
+- `agent-runbook` — author runbooks for AI agents (operational procedures: triggers, diagnostic steps, recovery, rollback). Scope TBD — needs to be distinct from skill-creator (skills = capability; runbooks = situational procedure).
