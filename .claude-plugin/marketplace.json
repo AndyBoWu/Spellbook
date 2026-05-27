@@ -20,8 +20,8 @@
       "repository": "https://github.com/AndyBoWu/Spellbook"
     },
     {
-      "name": "gha-create",
-      "source": "./skills/gha-create",
+      "name": "ghactor",
+      "source": "./skills/ghactor",
       "description": "Generates GitHub Actions workflows with elite-level security and efficiency best practices",
       "version": "0.1.0",
       "license": "MIT",

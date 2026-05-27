@@ -1,5 +1,5 @@
 {
-  "name": "gha-create",
+  "name": "ghactor",
   "description": "Generates GitHub Actions workflows with elite-level security and efficiency best practices",
   "version": "0.1.0",
   "author": {

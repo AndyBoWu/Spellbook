@@ -1,5 +1,5 @@
 ---
-name: gha-create
+name: ghactor
 description: "Generates GitHub Actions workflows following elite-level security and efficiency best practices. Use when writing new CI/CD workflows, modifying existing workflows, or reviewing workflows for hardening opportunities. Applies SHA-pinned actions, least-privilege permissions, OIDC authentication, injection prevention, path filtering, native caching, and concurrency control. Do NOT use for non-GitHub-Actions CI/CD systems or general DevOps tasks unrelated to workflow authoring."
 license: MIT
 compatibility: "Layer 1 (Knowledge): Any AI agent. Layer 2 (Validator): bash 4.0+, grep, awk."
@@ -62,7 +62,7 @@ metadata:
 ### Knowledge-Driven (Agent reads rules, writes workflows)
 
 ```
-Generate a CI workflow for my Node.js project following gha-create best practices
+Generate a CI workflow for my Node.js project following ghactor best practices
 ```
 
 The agent reads this SKILL.md, applies all 8 rules, and produces a hardened workflow.
@@ -71,11 +71,11 @@ The agent reads this SKILL.md, applies all 8 rules, and produces a hardened work
 
 ```bash
 # Validate a single workflow
-./skills/gha-create/scripts/validate_workflow.sh .github/workflows/ci.yml
+./skills/ghactor/scripts/validate_workflow.sh .github/workflows/ci.yml
 
 # Validate all workflows in a directory
 for f in .github/workflows/*.yml; do
-  ./skills/gha-create/scripts/validate_workflow.sh "$f"
+  ./skills/ghactor/scripts/validate_workflow.sh "$f"
 done
 ```
 
@@ -320,7 +320,7 @@ If a workflow is used in only one repository and is not repeated elsewhere, keep
 ### Automated Validation
 
 ```bash
-./skills/gha-create/scripts/validate_workflow.sh <workflow-file>
+./skills/ghactor/scripts/validate_workflow.sh <workflow-file>
 ```
 
 Exit code 0 = all checks pass. Exit code 1 = violations found.

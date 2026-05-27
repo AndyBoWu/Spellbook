@@ -6,7 +6,7 @@ Scan a repo for secrets, quality issues, missing docs, and compliance problems b
 
 ```bash
 # Install the plugin
-/plugin install repo-audit@nexus-skills
+/plugin install repo-audit@spellbook
 
 # Ask the agent to scan
 Scan this repository for public readiness issues
@@ -25,7 +25,7 @@ Scan this repository for public readiness issues
 ## GitHub Actions
 
 ```yaml
-- uses: PSDN-AI/nexus-skills/skills/repo-audit@main
+- uses: AndyBoWu/Spellbook/skills/repo-audit@main
   id: scan
   with:
     repo_path: "."

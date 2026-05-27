@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run_tests.sh — Entry point for gha-create test suite.
+# run_tests.sh — Entry point for ghactor test suite.
 #
 # Usage: bash tests/run_tests.sh
 

@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run readiness scan
-        uses: PSDN-AI/nexus-skills/skills/repo-audit@v0.0.1
+        uses: AndyBoWu/Spellbook/skills/repo-audit@v0.0.1
         id: scan
 
       - name: Show report

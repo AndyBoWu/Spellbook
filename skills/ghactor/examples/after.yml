@@ -1,4 +1,4 @@
-# AFTER: The same CI workflow, hardened with gha-create rules
+# AFTER: The same CI workflow, hardened with ghactor rules
 # Every change from before.yml is annotated with the rule it satisfies.
 # SHA pins verified: 2026-02-28. See references/SHA_LOOKUP.md to check for updates.
 

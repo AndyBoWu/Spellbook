@@ -43,7 +43,7 @@ runs:
       if: ${{ inputs.fail_on_violations == 'true' && steps.validate.outputs.status == 'FAIL' }}
       shell: bash
       run: |
-        echo "gha-create found workflow violations" >&2
+        echo "ghactor found workflow violations" >&2
         exit 1
 
     - name: Display summary

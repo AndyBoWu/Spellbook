@@ -1,4 +1,4 @@
-# gha-create
+# ghactor
 
 Generate GitHub Actions workflows with elite-level security and efficiency best practices.
 
@@ -6,7 +6,7 @@ Generate GitHub Actions workflows with elite-level security and efficiency best 
 
 ```bash
 # Install the plugin
-/plugin install gha-create@nexus-skills
+/plugin install ghactor@spellbook
 
 # Ask the agent to generate a workflow
 Generate a CI workflow for my Node.js project following best practices
@@ -16,18 +16,18 @@ Generate a CI workflow for my Node.js project following best practices
 
 ```bash
 # Validate a single workflow
-./skills/gha-create/scripts/validate_workflow.sh .github/workflows/ci.yml
+./skills/ghactor/scripts/validate_workflow.sh .github/workflows/ci.yml
 
 # Validate all workflows in a directory
 for f in .github/workflows/*.yml; do
-  ./skills/gha-create/scripts/validate_workflow.sh "$f"
+  ./skills/ghactor/scripts/validate_workflow.sh "$f"
 done
 ```
 
 ## GitHub Actions
 
 ```yaml
-- uses: PSDN-AI/nexus-skills/skills/gha-create@<full-commit-sha>
+- uses: AndyBoWu/Spellbook/skills/ghactor@<full-commit-sha>
   id: validate
   with:
     workflow_dir: ".github/workflows"

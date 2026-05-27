@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # validate_workflow.sh — Validate a GitHub Actions workflow against
-# gha-create security and efficiency best practices.
+# ghactor security and efficiency best practices.
 #
 # Usage: ./validate_workflow.sh <workflow-file>
 # Exit 0 = all required checks pass

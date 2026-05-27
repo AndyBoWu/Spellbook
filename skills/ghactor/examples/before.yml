@@ -1,5 +1,5 @@
 # BEFORE: A naive but functional CI workflow
-# This workflow violates multiple gha-create rules.
+# This workflow violates multiple ghactor rules.
 # See after.yml for the hardened version.
 
 name: CI
