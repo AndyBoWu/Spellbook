@@ -3,125 +3,190 @@
 **Status.** Draft, awaiting user review. Implementation begins after sign-off.
 **Owner.** Andy Wu.
 **Date.** 2026-05-27.
+**Revision.** v2 — mission reframed around Single Source of Truth (see "Why this exists" below). v1 of this spec treated mirror-existing as the main mode and deferred drift repair; v2 reverses that.
+
+## Why this exists
+
+Most repos that need agent-facing docs land in one of two states:
+
+1. **One file exists** — `CLAUDE.md` xor `AGENTS.md` is present. The other agent runtime has no guidance.
+2. **Both files exist, but neither is a SoT** — the two files disagree, or each is an unstructured pile of notes. Agents can't trust either as canonical.
+
+These are the cases `init2` exists to solve. Empty-repo bootstrapping (case 3) is a bonus capability — same template, fewer inputs.
+
+The v1.0 stance: **`init2` owns the structure.** There is one canonical template; all three cases write into it. Existing content is preserved as facts, but the skeleton is replaced. The user gets to approve the change via a unified diff before any file is written.
 
 ## Goal
 
-Promote `init2` from v0.2 (one verified shape) to v1.0 (two verified shapes), and lock the public contract so v1.x is non-breaking.
+Promote `init2` from v0.2 to v1.0 by verifying the canonical-template approach against all three cases with the same RED-GREEN methodology as v0.2.
 
-v1.0 = **battle-tested**: paired-subagent verification on the two repo shapes below, using the same RED-GREEN methodology as v0.2.
+| Case | Description | Fixture | Status |
+|---|---|---|---|
+| 1 | One file exists (CLAUDE.md xor AGENTS.md) | Burnbar current state — has `CLAUDE.md`, no `AGENTS.md` | 🎯 v1.0 |
+| 2 | Both files exist, drifted | Synthesized from v0.2 baseline output (two 108-line files with 0/9 matching headings — literal drift) | 🎯 v1.0 |
+| 3 | Empty repo | Fresh fixture committed at `skills/init2/test-fixtures/case3-empty/` (mirrors Burnbar's pre-CLAUDE shape: README + ROADMAP + docs/, no agent files) | 🎯 v1.0 (re-verify after refactor) |
 
-| Shape | State | Status |
+The symmetric variant of case 1 (`AGENTS.md` exists, `CLAUDE.md` does not) is covered by construction — same code path with the roles swapped. If a real instance appears later, run the RED-GREEN gate on it and add a row to TESTING.md.
+
+Out of scope for v1.0: real-source repos, polyglot / monorepo, drift detection beyond the in-skill reconciliation (i.e., the skill doesn't watch for drift over time), per-package or workspace-aware files.
+
+## The canonical template
+
+Six sections, in this order. This is the SoT contract for v1.0+:
+
+| # | Section | Purpose |
 |---|---|---|
-| Docs-only, greenfield | No `CLAUDE.md`, no `AGENTS.md` | ✅ Verified in v0.2 (Burnbar, pre-CLAUDE.md) |
-| Docs-only, existing CLAUDE.md | `CLAUDE.md` present, no `AGENTS.md` | 🎯 v1.0 target (Burnbar, current state) |
+| 1 | **Overview** | Project purpose, 1–3 sentences. What and why. |
+| 2 | **Commands** | Build / lint / test / run, exact strings. Tool-agnostic. |
+| 3 | **Architecture** | How the system fits together. Modules, data flow, key decisions. |
+| 4 | **Load-bearing constraints** | Hard rules. "Never do X." Privacy/scope/language constraints. |
+| 5 | **Source of truth** | Pointers to `PLAN.md` / `ROADMAP.md` / `ARCHITECTURE.md` etc. |
+| 6 | **`<Agent>` notes** | The only section that differs between CLAUDE.md and AGENTS.md (Claude-Code-specific tooling for one, Codex sandbox quirks for the other). |
 
-The symmetric shape — existing `AGENTS.md`, no `CLAUDE.md` — is covered by construction (same code path in `§4`), not by a separate test. If a real instance of the symmetric shape appears later, run the same RED-GREEN gate against it and add a row to TESTING.md.
+Section 6 is also the catch-all: any content from an existing file that doesn't map cleanly into 1–5 lands here. Future versions may add sections (non-breaking); reordering or removing is a v2.0 move.
 
-Out of scope for v1.0 (deferred): real-source repos, polyglot / monorepo, both-files-drifted, drift detection, per-package files.
+## Architecture
 
-## Architecture change
-
-Today's flow is linear: scan → write `CLAUDE.md` → write `AGENTS.md` → verify. v1.0 introduces a mode branch driven by what the scan finds at the repo root:
+Three input states converge on the canonical template through a single write path:
 
 ```
-scan codebase + detect existing files
-├── greenfield (no CLAUDE.md, no AGENTS.md)
-│     → write both using skill's default skeleton  (v0.2 path, unchanged)
+scan repo + detect existing files
 │
-└── mirror mode (CLAUDE.md xor AGENTS.md present)
-      → extract skeleton from existing file
-      → write only the missing file, mirroring extracted skeleton
-      → never modify the existing file
+├── empty                    ┐
+│                            │
+├── one file exists          ├──→ build canonical content from
+│   (CLAUDE.md xor AGENTS.md)│    (a) existing-file facts (precedence)
+│                            │    (b) codebase scan (augmentation)
+└── both files exist         ┘    (c) template fallbacks (last resort)
+                                       │
+                                       ▼
+                              propose unified diff to user
+                                       │
+                                       ▼
+                              user approves? — write both files
 ```
 
-Both-files-exist is explicitly not handled in v1.0. If the skill encounters it, it reports "both files present — out of scope for this version" and exits without writing.
+### Behavior in each case
 
-### Two new behaviors
+**Case 1 (one file exists).** Extract facts from the existing file. Restructure them into the canonical template. Generate the missing file using the same canonical structure. Both files (the existing one, now reorganized; and the new one) are written.
 
-1. **Skeleton extraction.** Parse the existing file's `##` headings in document order. That ordered list becomes the canonical skeleton for this run, overriding the skill's default.
-2. **Non-destructive default.** The existing file is treated as ground truth and never edited in v1.0. No diff proposal, no drift flag — read-only.
+**Case 2 (both files exist, drifted).** Extract facts from both files. Reconcile conflicts (see precedence rules below). Restructure into the canonical template. Both files are rewritten.
 
-### Approach rationale (Approach A: mirror existing)
+**Case 3 (empty repo).** Run the codebase scan. Populate the canonical template from scan results. For sections the scan can't fill (e.g., constraints in a docs-only repo), use template placeholder language explicitly marked as such — never invent.
 
-Two alternatives were considered and rejected:
+### Precedence rules (which fact wins when sources disagree)
 
-- **Force canonical skeleton + propose diff to existing file.** Too pushy for a personal-grimoire skill; users who curated their CLAUDE.md will reject the diff and end up with mismatched files anyway.
-- **Two-pass with explicit pick.** Adds a decision prompt up front. More correct in principle, but slows the common path. Revisit if v1.x users report wanting it.
+When the same fact appears in multiple sources with different values:
 
-Mirror mode respects the user's prior curation, matches the skill's existing "propose a diff before overwriting" posture, and produces zero-churn output on the common case.
+1. **Code beats docs.** A build command in `package.json`/`Makefile`/etc. overrides a different command claimed in `CLAUDE.md` or `AGENTS.md`. The doc was stale.
+2. **Existing-file consensus beats single source.** If `CLAUDE.md` and `AGENTS.md` agree on a fact and code doesn't say otherwise, that's the canonical value.
+3. **Conflicts between existing files with no code arbitration.** Stop and report — do not silently pick a side. The user resolves.
+
+These rules go in the SKILL.md verbatim.
+
+### Safety: diff + confirm
+
+Before writing anything in cases 1 and 2 (where existing files would change), the skill emits a unified diff of the proposed `CLAUDE.md` and `AGENTS.md` against their current state and asks the user to confirm. No silent overwrites. This works regardless of git state — the user can run the skill mid-development without needing a clean tree.
+
+In case 3 (empty repo), there's nothing to diff against; the skill still summarizes what it's about to write but doesn't block on confirmation.
 
 ## SKILL.md edits
 
-In order of appearance in the file.
+Substantial rewrite. The current sections need to be reshaped around the three cases, not the v0.2 linear flow.
 
-**§1 Scan — add detection.** Before the codebase scan, list the repo root and record whether `CLAUDE.md` and `AGENTS.md` exist. This selects the write mode.
+**Overview — rewrite.** State the SoT mission: init2 owns the structure, three input cases, one template, diff+confirm before write.
 
-**§2 Identify load-bearing facts — add precedence rule.** When an existing file is present, its facts are the ground truth. The codebase scan augments but does not contradict. If a fact in the existing file disagrees with the source (e.g., build command in `CLAUDE.md` not present in `package.json`), stop and report — do not silently rewrite.
+**When to Use — refresh.** Replace the four bullets with case 1, case 2, case 3 framings. The "Don't use for" block stays roughly the same.
 
-**§3 Write CLAUDE.md — gate on mode.**
-- *Greenfield (no CLAUDE.md):* current text, unchanged.
-- *Mirror mode (CLAUDE.md exists):* skip this step entirely. Proceed to §4.
+**§1 Scan — add case detection.** Before the codebase scan, list the repo root, record whether `CLAUDE.md` and `AGENTS.md` exist, and branch into one of the three cases.
 
-**§4 Write AGENTS.md — gate on mode.**
-- *Greenfield:* current text, default skeleton.
-- *Mirror mode (CLAUDE.md exists, AGENTS.md does not):* extract `##` headings from the existing `CLAUDE.md` in document order. Use that exact list as the AGENTS.md skeleton. Per-section, copy facts from `CLAUDE.md` where they are tool-agnostic; apply the existing tonal swaps for Codex (slight directive shift, drop Claude-Code-specific tooling references).
-- *Symmetric mirror mode (AGENTS.md exists, CLAUDE.md does not):* same logic, reversed targets.
+**§2 Load-bearing facts — add precedence rules.** The three rules above, verbatim.
 
-**§5 Verify — strengthen.** Add: in mirror mode, `grep '^##' CLAUDE.md AGENTS.md` must yield identical heading text in identical order, except the final `<Agent> notes` section. Any mismatch means re-extract.
+**§3 Build canonical content — new section, replaces v0.2 §3 + §4.** For each of the six canonical sections, gather content from sources in precedence order. Map existing-file content into the right canonical section; never drop content silently — what doesn't fit goes in `<Agent> notes`.
 
-**§6 Report — record mode used.** Single line in the summary: `Wrote AGENTS.md in mirror mode (skeleton from existing CLAUDE.md)` or `Wrote both files in greenfield mode` or the symmetric variant.
+**§4 Propose diff and confirm — new section.** Generate the two file contents in memory. For cases 1 and 2, emit a unified diff against the existing files and require explicit user confirmation before writing. For case 3, summarize and write.
 
-**Common Mistakes table — add row.**
+**§5 Verify — strengthen.** Add: heading lists from both files must match the canonical template's six sections exactly (last one is `<Agent> notes` variant). `grep '^##' CLAUDE.md AGENTS.md` must show the same first five headings and the agent-specific sixth.
 
-| Wrote the new file using the default skeleton when the existing file used a different one | Defeats the mirror-mode contract; produces drift-on-arrival | Extract skeleton from the existing file first; use it verbatim |
+**§6 Report — record case + diff status.** "Built canonical files for case 2 (drift reconciliation); diff approved 2026-MM-DD" or equivalent.
 
-**Status section — bump.** From v0.2 to v1.0 once the test below passes. Append a paragraph with the mirror-mode result alongside the v0.2 greenfield paragraph (don't replace — version history is the test trail).
+**Common Mistakes — replace some rows.** Drop the v0.2 mistakes that no longer apply ("running /init twice"). Add:
+- "Restructured existing files without showing a diff" → always emit diff and pause for confirmation.
+- "Silently dropped content from an existing file that didn't fit a canonical section" → map every non-empty paragraph somewhere; use `<Agent> notes` as catch-all.
+- "Picked a side on a conflicting fact across two existing files" → stop and report; the user resolves.
+
+**Status section — bump and replace.** v0.2 paragraph stays as history. New v1.0 paragraph summarizes the three-case verification.
 
 ## Test plan
 
-Same RED-GREEN methodology as v0.2: paired subagent runs, sealed prompts, diff outputs.
+Same RED-GREEN paired-subagent methodology as v0.2. Three cases, three paired runs, six subagents total.
 
-**Target fixture.** Burnbar's current state on 2026-05-27: `README.md` + `ROADMAP.md` + `docs/PLAN.md` + `docs/data-sources.md` + existing `CLAUDE.md` (6351 bytes, from v0.2). No `AGENTS.md`. No source code. The existing `CLAUDE.md` is the fixture; do not regenerate it before the test.
+### Case 1 — one file exists (CLAUDE.md only)
 
-**Baseline prompt** (sealed; no mention of the skill). Tells the subagent: this repo has a `CLAUDE.md`; generate an `AGENTS.md` for Codex describing the same project. Output to `/tmp/spellbook-test/v1-baseline/AGENTS.md`. Copy `CLAUDE.md` to the same directory post-run for byte-comparison.
+**Fixture.** Burnbar current state on 2026-05-27: existing `CLAUDE.md` (6351 bytes), no `AGENTS.md`, no source code.
 
-**With-skill prompt.** Same task plus full `SKILL.md` content embedded between `---SKILL START---` / `---SKILL END---` markers. Output to `/tmp/spellbook-test/v1-skill/AGENTS.md`. Same `CLAUDE.md` copy.
+**Baseline prompt.** Sealed; no mention of the skill. "This repo has a CLAUDE.md. Generate an AGENTS.md describing the same project."
 
-**Pass criteria for v1.0 promotion** (all four must hold for the with-skill run):
+**With-skill prompt.** Same task plus full `SKILL.md` content embedded. Plus the explicit instruction: "Apply the canonical template to both files; show the diff for CLAUDE.md before any write."
 
-1. `grep '^##' CLAUDE.md AGENTS.md` shows identical heading text in identical order, except the final `<Agent> notes` section.
-2. Original Burnbar `CLAUDE.md` is byte-identical before and after the run (skill did not modify it).
-3. Any build/lint/test commands present in both files match byte-for-byte.
-4. `AGENTS.md` does not invent files, scripts, or commands not in the source repo or in `CLAUDE.md`.
+**Pass criteria** (all four hold for with-skill):
+1. Both output files have the six canonical section headings, in order, with section 6 named `Claude Code notes` / `Codex notes` respectively.
+2. `grep '^##' CLAUDE.md AGENTS.md` matches on sections 1–5; section 6 differs as expected.
+3. Build/lint/test/run commands are byte-identical between the two files.
+4. No invented files, scripts, or commands.
 
-**Skill is load-bearing if** the baseline run fails criterion #1 (heading reorganization) or #2 (baseline edited CLAUDE.md). Those are the two failures the mirror-mode contract specifically prevents. Baseline failures only on #3 or #4 alone don't count — those are generic agent failures, not what mirror mode addresses. If the baseline doesn't fail #1 or #2, the test is inconclusive: harden the baseline (e.g., a CLAUDE.md with deliberately unusual section ordering that invites reorganization) or reconsider whether mirror mode is solving a real problem on this fixture.
+### Case 2 — both files exist, drifted
 
-**Metrics to record in TESTING.md** — new row in the existing v0.2 table, plus a new `mode` column distinguishing greenfield from mirror runs. Don't delete the v0.2 row.
+**Fixture.** Hand-crafted drifted pair committed at `skills/init2/test-fixtures/case2-drift/` — same project (Burnbar shape), but the two files use deliberately incompatible section structures (e.g., CLAUDE.md uses narrative headings, AGENTS.md uses contract-style headings) and disagree on at least one build/lint/test command. Stored in-repo so the fixture is stable and reproducible across runs. (The v0.2 baseline /tmp output is gone; we don't depend on it.)
+
+**Baseline prompt.** "This repo has CLAUDE.md and AGENTS.md. They're out of sync. Reconcile them."
+
+**With-skill prompt.** Same task plus `SKILL.md`. "Apply the canonical template; show the diff for both files before writing."
+
+**Pass criteria.** Same four as case 1, plus:
+5. No fact is silently dropped between input and output (verify by spot-checking the diff for content that's in the input but missing from the output).
+
+### Case 3 — empty repo
+
+**Fixture.** `skills/init2/test-fixtures/case3-empty/` — only `README.md`, `ROADMAP.md`, `docs/PLAN.md`, `docs/data-sources.md`. No `CLAUDE.md`, no `AGENTS.md`. (Mirrors the v0.2 Burnbar starting state, but committed in-repo so it's stable across runs.)
+
+**Baseline prompt.** v0.2 baseline prompt, unchanged.
+
+**With-skill prompt.** v0.2 with-skill prompt with one addition: "Use the canonical six-section template from §3 of the embedded SKILL.md exactly."
+
+**Pass criteria.** Same four as case 1. Comparing against the v0.2 with-skill run (7/8 heading match), v1.0 should be 6/6 (full canonical match).
+
+### Promotion gate
+
+All three cases pass their criteria for the with-skill run AND fail ≥1 criterion in the baseline run. Mirror-mode tests where baseline accidentally meets all criteria are inconclusive — harden the baseline or revisit scope.
+
+### Metrics in TESTING.md
+
+Replace the v0.2 single-row table with a four-row table (v0.2 greenfield + three v1.0 cases) keeping a `case` and `mode` column. Don't delete the v0.2 row.
 
 ## Promotion criteria
 
-**Promotion gate.** Both conditions hold:
-1. With-skill run passes all four criteria above.
-2. Baseline run fails ≥1 of them.
+**Promotion gate.** Both:
+1. All three cases pass their full pass-criteria sets on the with-skill run.
+2. Each case shows the baseline failing ≥1 criterion that the skill specifically addresses (heading restructure, drift reconciliation, or template completeness — not generic agent failures like inventing commands).
 
-If either condition misses, v0.2 remains current. Revise the skill (or the test) before retrying.
-
-**Ship list when the gate passes** (single PR):
-- `skills/init2/SKILL.md` — edits from the SKILL.md section above; Status bumped to v1.0.
-- `skills/init2/TESTING.md` — new row in the metrics table; mirror-mode prompt templates added under "Reproducing the test".
+**Ship list when gate passes** (single PR):
+- `skills/init2/SKILL.md` — rewrite per the SKILL.md edits section above; Status bumped to v1.0 with the new three-case results.
+- `skills/init2/TESTING.md` — four-row metrics table; three new prompt templates for the case-specific tests; reproducibility instructions updated.
 - No README changes — Spellbook README doesn't track per-skill versions.
 
 **What v1.0 promises** (the contract this locks):
-- Two modes — greenfield and one-file-exists mirror — work end-to-end on the verified fixtures.
-- The default skeleton used in greenfield mode is stable for v1.x. Adding sections is non-breaking; reordering or removing is a v2.0 move.
-- Frontmatter shape (`name`, `description`) is stable for v1.x.
+- Three input cases (empty, one-file-exists, both-files-exist) all produce files matching the canonical template.
+- The canonical template's six sections are stable in v1.x. Adding sections is non-breaking; reordering or removing is v2.0.
+- Frontmatter shape (`name`, `description`) is stable in v1.x.
+- Diff + confirm is the default safety bar for any run that would modify existing files. Removing this is v2.0.
 
 **What v1.0 explicitly does not promise** (deferred):
-- Both-files-exist drift repair (separate mode, separate plan).
+- Real-source-repo coverage (queued for v1.1).
 - Polyglot / monorepo coverage.
 - Per-package or workspace-aware files.
-- Drift detection or suggestions on existing files.
+- Drift detection over time (the skill reconciles drift at run time; it doesn't watch for it).
 
-**When to cut v1.1+.** New repo-shape coverage that passes the same RED-GREEN gate. One shape per minor: v1.1 = real-source repo, v1.2 = monorepo, etc. The shape and its test land together — no "add the feature now, test later."
+**When to cut v1.1+.** New repo-shape coverage that passes the same RED-GREEN gate. The shape and its test land together — no "add the feature now, test later."
 
-**When to cut v2.0.** Breaking the default skeleton, breaking the frontmatter shape, or changing the non-destructive default for existing files.
+**When to cut v2.0.** Breaking the canonical template (reorder / remove sections), breaking frontmatter, or weakening the diff+confirm safety bar.
