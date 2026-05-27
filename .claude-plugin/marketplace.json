@@ -1,0 +1,45 @@
+{
+  "name": "spellbook",
+  "owner": {
+    "name": "Andy Wu"
+  },
+  "metadata": {
+    "description": "A personal grimoire of Claude Code skills",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "init2",
+      "source": "./skills/init2",
+      "description": "Generates both CLAUDE.md and AGENTS.md from one codebase scan — for repos used with Claude Code and OpenAI Codex",
+      "version": "0.1.0",
+      "license": "MIT",
+      "keywords": ["init", "claude-code", "codex", "agents-md", "documentation"],
+      "category": "developer-experience",
+      "homepage": "https://github.com/AndyBoWu/Spellbook",
+      "repository": "https://github.com/AndyBoWu/Spellbook"
+    },
+    {
+      "name": "gha-create",
+      "source": "./skills/gha-create",
+      "description": "Generates GitHub Actions workflows with elite-level security and efficiency best practices",
+      "version": "0.1.0",
+      "license": "MIT",
+      "keywords": ["github-actions", "ci-cd", "security", "devops", "workflow"],
+      "category": "devops",
+      "homepage": "https://github.com/AndyBoWu/Spellbook",
+      "repository": "https://github.com/AndyBoWu/Spellbook"
+    },
+    {
+      "name": "repo-audit",
+      "source": "./skills/repo-audit",
+      "description": "Scans repositories for secrets, code quality issues, missing documentation, and compliance problems before making them public",
+      "version": "0.1.0",
+      "license": "MIT",
+      "keywords": ["security", "secrets", "compliance", "documentation", "code-quality"],
+      "category": "security",
+      "homepage": "https://github.com/AndyBoWu/Spellbook",
+      "repository": "https://github.com/AndyBoWu/Spellbook"
+    }
+  ]
+}

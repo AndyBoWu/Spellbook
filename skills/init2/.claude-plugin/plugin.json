@@ -1,0 +1,8 @@
+{
+  "name": "init2",
+  "description": "Generates both CLAUDE.md and AGENTS.md from one codebase scan — for repos used with Claude Code and OpenAI Codex",
+  "version": "0.1.0",
+  "author": {
+    "name": "Andy Wu"
+  }
+}
