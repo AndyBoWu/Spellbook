@@ -3,7 +3,6 @@
 **Status.** Draft, awaiting user review. Implementation begins after sign-off.
 **Owner.** Andy Wu.
 **Date.** 2026-05-27.
-**Revision.** v2 — mission reframed around Single Source of Truth (see "Why this exists" below). v1 of this spec treated mirror-existing as the main mode and deferred drift repair; v2 reverses that.
 
 ## Why this exists
 
@@ -23,7 +22,7 @@ Promote `init2` from v0.2 to v1.0 by verifying the canonical-template approach a
 | Case | Description | Fixture | Status |
 |---|---|---|---|
 | 1 | One file exists (CLAUDE.md xor AGENTS.md) | Burnbar current state — has `CLAUDE.md`, no `AGENTS.md` | 🎯 v1.0 |
-| 2 | Both files exist, drifted | Synthesized from v0.2 baseline output (two 108-line files with 0/9 matching headings — literal drift) | 🎯 v1.0 |
+| 2 | Both files exist, drifted | Hand-crafted drifted pair at `skills/init2/test-fixtures/case2-drift/` — same project, incompatible section structures, conflicting commands | 🎯 v1.0 |
 | 3 | Empty repo | Fresh fixture committed at `skills/init2/test-fixtures/case3-empty/` (mirrors Burnbar's pre-CLAUDE shape: README + ROADMAP + docs/, no agent files) | 🎯 v1.0 (re-verify after refactor) |
 
 The symmetric variant of case 1 (`AGENTS.md` exists, `CLAUDE.md` does not) is covered by construction — same code path with the roles swapped. If a real instance appears later, run the RED-GREEN gate on it and add a row to TESTING.md.
