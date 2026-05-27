@@ -8,7 +8,7 @@ Each folder under `skills/` is one **spell** — a self-contained reference Clau
 
 | Spell | What it does |
 |---|---|
-| [`dual-init`](skills/dual-init/) | Generates **both** `CLAUDE.md` and `AGENTS.md` from one codebase scan — for repos used with Claude Code *and* OpenAI Codex |
+| [`init2`](skills/init2/) | Generates **both** `CLAUDE.md` and `AGENTS.md` from one codebase scan — for repos used with Claude Code *and* OpenAI Codex |
 
 ## Install
 
@@ -21,7 +21,7 @@ Symlink (or copy) each spell into your personal skills directory:
 ```bash
 git clone https://github.com/andybowu/Spellbook.git ~/Repos/Spellbook
 mkdir -p ~/.claude/skills
-ln -s ~/Repos/Spellbook/skills/dual-init ~/.claude/skills/dual-init
+ln -s ~/Repos/Spellbook/skills/init2 ~/.claude/skills/init2
 ```
 
 Restart Claude Code; the skill appears in the available-skills list and is invocable via the `Skill` tool or by name in conversation.
@@ -32,7 +32,7 @@ Codex CLI reads skills from `~/.agents/skills/`. Same idea:
 
 ```bash
 mkdir -p ~/.agents/skills
-ln -s ~/Repos/Spellbook/skills/dual-init ~/.agents/skills/dual-init
+ln -s ~/Repos/Spellbook/skills/init2 ~/.agents/skills/init2
 ```
 
 ## Use
@@ -40,7 +40,7 @@ ln -s ~/Repos/Spellbook/skills/dual-init ~/.agents/skills/dual-init
 Once installed:
 
 ```
-> dual-init this repo
+> init2 this repo
 ```
 
 …or invoke explicitly via the `Skill` tool. The spell handles the rest.
@@ -56,7 +56,7 @@ skills/<spell-name>/
 
 See [agentskills.io/specification](https://agentskills.io/specification) for the SKILL.md frontmatter spec.
 
-Skills here are gated on **paired subagent runs** (baseline without the skill, then with). See [`skills/dual-init/TESTING.md`](skills/dual-init/TESTING.md) for the template. No skill edit lands without a failing test first.
+Skills here are gated on **paired subagent runs** (baseline without the skill, then with). See [`skills/init2/TESTING.md`](skills/init2/TESTING.md) for the template. No skill edit lands without a failing test first.
 
 ## License
 

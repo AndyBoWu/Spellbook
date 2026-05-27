@@ -1,9 +1,9 @@
 ---
-name: dual-init
+name: init2
 description: Use when a codebase needs documentation for both Claude Code (CLAUDE.md) and OpenAI Codex (AGENTS.md) — typically on first contact with a new repo, or when adding Codex support to an existing Claude-only project. Generates both files from a single codebase scan so they stay in sync.
 ---
 
-# dual-init
+# init2
 
 ## Overview
 
@@ -130,7 +130,7 @@ One short summary: what you wrote, where the facts came from, what you chose to 
 | Running `/init` twice (once per file) | Scans the codebase twice, files drift on second pass | One scan, two writes |
 | Pasting full file contents in the summary | Wastes user's context, they can `cat` the file | One-paragraph summary only |
 | Inventing build commands not in the repo | Future agents will run them and fail | Verify every command against actual scripts/Makefile/package.json before writing it |
-| Diverging architecture summaries between the two files | Defeats the whole point of dual-init | Write architecture once, paste into both |
+| Diverging architecture summaries between the two files | Defeats the whole point of init2 | Write architecture once, paste into both |
 | Diverging section structure (different headings, different ordering) | Most common drift vector — observed in v0.1 baseline testing | Lock the heading skeleton when writing CLAUDE.md, reuse verbatim for AGENTS.md |
 | Omitting build/lint/test entirely because the repo has no code yet | Future agents won't know what commands are coming | List planned commands from PLAN.md, mark them clearly as not-yet-runnable |
 | Overwriting an existing CLAUDE.md or AGENTS.md without asking | Destroys curated content | If a file exists, propose a diff and confirm before overwriting |

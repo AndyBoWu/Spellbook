@@ -1,4 +1,4 @@
-# Testing `dual-init`
+# Testing `init2`
 
 How this skill is verified. Methodology, recorded results, and how to reproduce — so future edits to `SKILL.md` are gated on the same kind of evidence.
 
@@ -20,7 +20,7 @@ We apply the **RED-GREEN-REFACTOR** cycle from TDD to skills (per [`superpowers:
 
 ## Methodology — paired subagent runs
 
-1. Pick a representative target repo. For `dual-init`, that's a real codebase with no existing `CLAUDE.md` / `AGENTS.md` (or one where we tell the agents to ignore the existing files).
+1. Pick a representative target repo. For `init2`, that's a real codebase with no existing `CLAUDE.md` / `AGENTS.md` (or one where we tell the agents to ignore the existing files).
 2. Write a **sealed prompt** for the baseline agent: describes the task naturally, no mention of the skill.
 3. Write a **sealed prompt** for the skill agent: same task, plus the full `SKILL.md` content embedded inline (subagents are isolated and can't load files from disk).
 4. Dispatch both in parallel, writing outputs to separate `/tmp/` directories.
