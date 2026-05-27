@@ -9,7 +9,7 @@ Each folder under `skills/` is one **spell** — a self-contained reference Clau
 | Spell | What it does | Status |
 |---|---|---|
 | [`init2`](skills/init2/) | Generates **both** `CLAUDE.md` and `AGENTS.md` from one codebase scan — for repos used with Claude Code *and* OpenAI Codex | Shipped |
-| `agent-runbook` | Authors runbooks for AI agents — operational procedures with triggers, diagnostic steps, recovery, rollback | TO-DO |
+| `playbook` | Authors playbooks for AI agents — operational procedures with triggers, diagnostic steps, recovery, rollback | TO-DO |
 
 ## Install
 
